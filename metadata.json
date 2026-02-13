@@ -1,0 +1,7 @@
+{
+  "name": "VibeBeat AI - Music Discovery",
+  "description": "An AI-powered music recommendation app that suggests songs based on your mood or uploaded photos using Gemini AI analysis.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
