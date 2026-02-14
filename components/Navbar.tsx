@@ -71,7 +71,8 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout, currentView, onNavigate
           {/* Mobile Menu Toggle */}
           <button 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 text-gray-400 hover:text-white"
+            className="md:hidden p-2 text-gray-400 hover:text-white transition-colors"
+            aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? (
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -84,28 +85,38 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout, currentView, onNavigate
 
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-neutral-900 border-b border-neutral-800 animate-in fade-in slide-in-from-top-4 duration-200">
-          <div className="flex flex-col p-6 gap-4">
+        <div className="md:hidden fixed inset-x-0 top-[73px] bottom-0 bg-black/95 backdrop-blur-xl z-[49] animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="flex flex-col p-8 gap-6 h-full overflow-y-auto">
             {navItems.map((item) => (
               (!item.role || item.role === user.role) && (
                 <button 
                   key={item.view}
                   onClick={() => handleNavigate(item.view)}
-                  className={`text-left text-lg font-black uppercase tracking-widest transition ${
-                    currentView === item.view ? 'text-purple-400' : 'text-gray-400'
+                  className={`text-left text-3xl font-black uppercase tracking-widest transition-all ${
+                    currentView === item.view ? 'text-purple-500 pl-4' : 'text-gray-500'
                   }`}
                 >
                   {item.label}
                 </button>
               )
             ))}
-            <div className="h-[1px] bg-neutral-800 my-2"></div>
-            <button 
-              onClick={onLogout}
-              className="text-left text-lg font-black uppercase tracking-widest text-red-500"
-            >
-              Logout
-            </button>
+            <div className="mt-auto pt-8 border-t border-neutral-800">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-12 h-12 bg-neutral-800 rounded-full flex items-center justify-center">
+                  <span className="text-white font-bold">{user.name[0]}</span>
+                </div>
+                <div>
+                   <p className="text-white font-black">{user.name}</p>
+                   <p className="text-gray-500 text-xs uppercase font-bold tracking-widest">{user.role}</p>
+                </div>
+              </div>
+              <button 
+                onClick={onLogout}
+                className="w-full bg-red-500/10 text-red-500 font-black uppercase tracking-widest py-5 rounded-2xl border border-red-500/20 active:bg-red-500/20 transition-all"
+              >
+                Logout Account
+              </button>
+            </div>
           </div>
         </div>
       )}

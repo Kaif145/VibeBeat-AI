@@ -21,10 +21,22 @@ const App: React.FC = () => {
   const [currentAnalysis, setCurrentAnalysis] = useState<AIRecommendation | null>(null);
   const [analysisSource, setAnalysisSource] = useState<'mood' | 'photo' | null>(null);
 
+  // Initial Load: User and Custom Discovered Songs
   useEffect(() => {
     const savedUser = localStorage.getItem('vibeBeat_user');
     if (savedUser) {
       setUser(JSON.parse(savedUser));
+    }
+
+    const savedCustomSongs = localStorage.getItem('vibeBeat_custom_songs');
+    if (savedCustomSongs) {
+      const customSongs: Song[] = JSON.parse(savedCustomSongs);
+      setSongs(prev => {
+        // Only add songs that don't already exist in the list
+        const existingIds = new Set(prev.map(s => s.id));
+        const uniqueCustom = customSongs.filter(s => !existingIds.has(s.id));
+        return [...prev, ...uniqueCustom];
+      });
     }
   }, []);
 
@@ -56,7 +68,38 @@ const App: React.FC = () => {
 
   const toggleSave = (songId: string) => {
     if (!user) return;
+    
     const isSaved = user.savedSongs.includes(songId);
+
+    // LOGIC FIX: If saving an AI track, we must register it in the master 'songs' list
+    if (!isSaved && songId.startsWith('ai-') && !songs.find(s => s.id === songId)) {
+      const aiTrack = currentAnalysis?.recommendedTracks.find(t => 
+        `ai-${t.title}-${t.artist}`.replace(/\s+/g, '-').toLowerCase() === songId
+      );
+
+      if (aiTrack) {
+        const newSong: Song = {
+          id: songId,
+          title: aiTrack.title,
+          artist: aiTrack.artist,
+          genre: aiTrack.tags[0] || 'Discovery',
+          vibe: currentAnalysis?.vibe || 'AI Mix',
+          language: Language.MIX,
+          previewUrl: '', // No preview for AI suggested tracks
+          coverUrl: `https://picsum.photos/seed/${songId}/800/1200`,
+          isTrending: false,
+          createdBy: 'ai'
+        };
+        
+        const updatedSongs = [...songs, newSong];
+        setSongs(updatedSongs);
+        
+        // Persist only the AI discovered songs to local storage
+        const customOnly = updatedSongs.filter(s => s.createdBy === 'ai');
+        localStorage.setItem('vibeBeat_custom_songs', JSON.stringify(customOnly));
+      }
+    }
+
     const updatedUser = {
       ...user,
       savedSongs: isSaved 
@@ -115,8 +158,8 @@ const App: React.FC = () => {
       <main className="flex-1 overflow-hidden relative">
         {isLoading && (
           <div className="absolute inset-0 z-50 bg-black/80 flex flex-col items-center justify-center">
-            <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p className="text-xl font-medium">AI is feeling your vibe...</p>
+            <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mb-6"></div>
+            <p className="text-2xl font-black uppercase tracking-widest text-purple-400">Tuning to your soul...</p>
           </div>
         )}
 
@@ -137,7 +180,7 @@ const App: React.FC = () => {
 
         {currentView === 'reels' && (
           <ReelsFeed 
-            songs={recommendedSongs.length > 0 ? recommendedSongs : songs} 
+            songs={songs.filter(s => s.isTrending || s.createdBy === 'admin')} 
             user={user}
             onLike={toggleLike}
             onSave={toggleSave}
@@ -154,7 +197,7 @@ const App: React.FC = () => {
         {currentView === 'saved' && (
           <SavedSongs 
             songs={songs.filter(s => user.savedSongs.includes(s.id))} 
-            onGoToReels={() => setCurrentView('reels')}
+            onGoToReels={() => setCurrentView('dashboard')}
           />
         )}
       </main>
