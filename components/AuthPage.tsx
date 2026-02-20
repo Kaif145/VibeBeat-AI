@@ -1,6 +1,8 @@
 
 import React, { useState } from 'react';
 import { User, UserRole } from '../types';
+import { Mail, Lock, User as UserIcon, ArrowRight, Music2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface AuthPageProps {
   onAuth: (user: User) => void;
@@ -15,7 +17,6 @@ const AuthPage: React.FC<AuthPageProps> = ({ onAuth }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Simulate API call
     const role = email.toLowerCase().includes('admin') ? UserRole.ADMIN : UserRole.USER;
     const mockUser: User = {
       id: Math.random().toString(36).substr(2, 9),
@@ -30,74 +31,112 @@ const AuthPage: React.FC<AuthPageProps> = ({ onAuth }) => {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-6">
-      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-purple-600 rounded-full blur-[120px] animate-pulse"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-600 rounded-full blur-[120px] animate-pulse delay-700"></div>
+    <div className="min-h-screen bg-black flex items-center justify-center p-6 overflow-hidden relative">
+      <div className="absolute inset-0 z-0 opacity-30 pointer-events-none">
+        <motion.div 
+          animate={{ 
+            scale: [1, 1.2, 1],
+            rotate: [0, 90, 0],
+          }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-purple-600/20 rounded-full blur-[120px]"
+        ></motion.div>
+        <motion.div 
+          animate={{ 
+            scale: [1.2, 1, 1.2],
+            rotate: [90, 0, 90],
+          }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-blue-600/20 rounded-full blur-[120px]"
+        ></motion.div>
       </div>
 
-      <div className="w-full max-w-md bg-neutral-900/50 border border-neutral-800 p-8 rounded-[40px] shadow-2xl backdrop-blur-xl relative z-10">
-        <div className="text-center mb-8 space-y-2">
-          <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <span className="text-white font-black text-2xl tracking-tighter">V</span>
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="w-full max-w-md bg-neutral-900/40 border border-neutral-800 p-8 md:p-10 rounded-[40px] shadow-2xl backdrop-blur-2xl relative z-10"
+      >
+        <div className="text-center mb-10 space-y-4">
+          <motion.div 
+            whileHover={{ rotate: 360 }}
+            transition={{ duration: 1 }}
+            className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center mx-auto shadow-xl shadow-purple-500/20"
+          >
+            <Music2 className="text-white w-8 h-8" />
+          </motion.div>
+          <div className="space-y-1">
+            <h2 className="text-4xl font-black italic tracking-tighter uppercase leading-none">
+              {isLogin ? 'Welcome Back' : 'Join VibeBeat'}
+            </h2>
+            <p className="text-gray-500 text-xs font-bold uppercase tracking-widest">Discover music through your emotions.</p>
           </div>
-          <h2 className="text-3xl font-black italic tracking-tighter uppercase">
-            {isLogin ? 'Welcome Back' : 'Join VibeBeat'}
-          </h2>
-          <p className="text-gray-400 text-sm">Discover music through your emotions.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
-            <input
-              type="text"
-              required
-              placeholder="Full Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full bg-black border border-neutral-700 rounded-2xl p-4 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
-            />
+            <div className="relative">
+              <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
+              <input
+                type="text"
+                required
+                placeholder="Full Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full bg-black/50 border border-neutral-800 rounded-2xl p-4 pl-12 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm"
+              />
+            </div>
           )}
-          <input
-            type="email"
-            required
-            placeholder="Email Address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-black border border-neutral-700 rounded-2xl p-4 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
-          />
-          <input
-            type="password"
-            required
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-black border border-neutral-700 rounded-2xl p-4 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
-          />
-          <button
+          <div className="relative">
+            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
+            <input
+              type="email"
+              required
+              placeholder="Email Address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-black/50 border border-neutral-800 rounded-2xl p-4 pl-12 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm"
+            />
+          </div>
+          <div className="relative">
+            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
+            <input
+              type="password"
+              required
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-black/50 border border-neutral-800 rounded-2xl p-4 pl-12 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all text-sm"
+            />
+          </div>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             type="submit"
-            className="w-full bg-white text-black font-black py-4 rounded-full hover:bg-gray-200 transition mt-4 uppercase tracking-widest text-sm"
+            className="w-full bg-white text-black font-black py-5 rounded-full hover:bg-purple-500 hover:text-white transition-all mt-6 uppercase tracking-[0.2em] text-[10px] flex items-center justify-center gap-2 shadow-xl shadow-white/5"
           >
             {isLogin ? 'Login' : 'Sign Up'}
-          </button>
+            <ArrowRight className="w-4 h-4" />
+          </motion.button>
         </form>
 
-        <p className="text-center mt-6 text-sm text-gray-500">
-          {isLogin ? "Don't have an account?" : "Already have an account?"}{' '}
-          <button
-            onClick={() => setIsLogin(!isLogin)}
-            className="text-white font-bold hover:underline"
-          >
-            {isLogin ? 'Sign Up' : 'Login'}
-          </button>
-        </p>
+        <div className="text-center mt-8">
+          <p className="text-xs text-neutral-500 font-medium">
+            {isLogin ? "Don't have an account?" : "Already have an account?"}{' '}
+            <button
+              onClick={() => setIsLogin(!isLogin)}
+              className="text-white font-black hover:text-purple-400 transition-colors uppercase tracking-widest ml-1"
+            >
+              {isLogin ? 'Sign Up' : 'Login'}
+            </button>
+          </p>
+        </div>
 
-        <div className="mt-8 pt-8 border-t border-neutral-800 text-center">
-          <p className="text-[10px] text-neutral-600 font-bold uppercase tracking-widest leading-relaxed">
+        <div className="mt-10 pt-8 border-t border-neutral-800/50 text-center">
+          <p className="text-[10px] text-neutral-600 font-black uppercase tracking-[0.2em] leading-relaxed">
             Hint: Use 'admin@vibebeat.com' to login as Admin
           </p>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

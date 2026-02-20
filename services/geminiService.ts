@@ -1,12 +1,18 @@
 
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI, Type, GenerateContentResponse } from "@google/genai";
 import { AIRecommendation } from "../types";
 
-const API_KEY = process.env.API_KEY || "";
+const getAI = () => {
+  const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY is not defined in the environment.");
+  }
+  return new GoogleGenAI({ apiKey });
+};
 
 export const analyzeMood = async (moodText: string): Promise<AIRecommendation> => {
-  const ai = new GoogleGenAI({ apiKey: API_KEY });
-  const response = await ai.models.generateContent({
+  const ai = getAI();
+  const response: GenerateContentResponse = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
     contents: `You are a world-class music curator. Analyze the following mood description and curate a list of 10 tracks that perfectly capture this emotional landscape.
     
@@ -43,12 +49,17 @@ export const analyzeMood = async (moodText: string): Promise<AIRecommendation> =
     }
   });
 
-  return JSON.parse(response.text || "{}");
+  try {
+    return JSON.parse(response.text || "{}");
+  } catch (error) {
+    console.error("Failed to parse AI response:", error);
+    throw new Error("Invalid response from AI");
+  }
 };
 
 export const analyzePhoto = async (base64Image: string): Promise<AIRecommendation> => {
-  const ai = new GoogleGenAI({ apiKey: API_KEY });
-  const response = await ai.models.generateContent({
+  const ai = getAI();
+  const response: GenerateContentResponse = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
     contents: {
       parts: [
@@ -83,5 +94,10 @@ export const analyzePhoto = async (base64Image: string): Promise<AIRecommendatio
     }
   });
 
-  return JSON.parse(response.text || "{}");
+  try {
+    return JSON.parse(response.text || "{}");
+  } catch (error) {
+    console.error("Failed to parse AI response:", error);
+    throw new Error("Invalid response from AI");
+  }
 };
