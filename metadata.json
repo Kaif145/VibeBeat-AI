@@ -1,6 +1,6 @@
 {
-  "name": "VibeBeat AI - Music Discovery",
-  "description": "An AI-powered music recommendation app that suggests songs based on your mood or uploaded photos using Gemini AI analysis.",
+  "name": "vibeSnap",
+  "description": "Music suggestion app based on mood and visuals, powered by AI.",
   "requestFramePermissions": [
     "camera"
   ]

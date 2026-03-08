@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Song } from '../types';
-import { Play, Music2, Sparkles, Search } from 'lucide-react';
+import { Play, Music2, Sparkles, Search, Disc } from 'lucide-react';
 import { motion } from 'framer-motion';
+import SpotifyEmbed from './SpotifyEmbed';
 
 interface SavedSongsProps {
   songs: Song[];
@@ -10,6 +11,8 @@ interface SavedSongsProps {
 }
 
 const SavedSongs: React.FC<SavedSongsProps> = ({ songs, onGoToReels }) => {
+  const [activeFullPlayer, setActiveFullPlayer] = useState<string | null>(null);
+
   return (
     <div className="h-full overflow-y-auto p-6 md:p-12 max-w-6xl mx-auto space-y-12 pb-24">
       <motion.header 
@@ -54,18 +57,33 @@ const SavedSongs: React.FC<SavedSongsProps> = ({ songs, onGoToReels }) => {
               className="group cursor-pointer space-y-4"
             >
               <div className="aspect-square rounded-[32px] overflow-hidden relative shadow-2xl border border-white/5">
-                <img src={song.coverUrl} className="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt={song.title} />
+                <img src={song.coverUrl} className="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt={song.title} referrerPolicy="no-referrer" />
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center backdrop-blur-sm">
-                  <motion.a 
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    href={`https://open.spotify.com/search/${encodeURIComponent(song.title + ' ' + song.artist)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-white text-black p-5 rounded-full shadow-2xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-300"
-                  >
-                    <Play className="w-7 h-7 fill-current" />
-                  </motion.a>
+                  {song.spotifyId ? (
+                    <motion.button 
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setActiveFullPlayer(song.id);
+                      }}
+                      className="bg-[#1DB954] text-white p-5 rounded-full shadow-2xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-300"
+                    >
+                      <Play className="w-7 h-7 fill-current" />
+                    </motion.button>
+                  ) : (
+                    <motion.a 
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      href={`https://open.spotify.com/search/${encodeURIComponent(song.title + ' ' + song.artist)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-[#1DB954] text-white p-5 rounded-full shadow-2xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-300"
+                    >
+                      <Play className="w-7 h-7 fill-current" />
+                    </motion.a>
+                  )}
                 </div>
                 {song.createdBy === 'ai' && (
                   <div className="absolute top-4 left-4">
@@ -76,11 +94,58 @@ const SavedSongs: React.FC<SavedSongsProps> = ({ songs, onGoToReels }) => {
                   </div>
                 )}
               </div>
-              <div className="px-1 space-y-0.5">
+              <div className="px-1 space-y-2">
                 <h4 className="font-black text-lg truncate group-hover:text-purple-400 transition-colors uppercase tracking-tight">{song.title}</h4>
                 <p className="text-xs font-bold text-gray-500 truncate uppercase tracking-widest">{song.artist}</p>
-                <div className="flex gap-2 mt-2">
+                
+                <div className="pt-2">
+                  {activeFullPlayer === song.id && song.spotifyId ? (
+                    <div className="space-y-2">
+                      <SpotifyEmbed trackId={song.spotifyId} compact height={80} />
+                      <button 
+                        onClick={() => setActiveFullPlayer(null)}
+                        className="w-full text-[8px] font-black uppercase text-purple-500 hover:text-purple-400 transition-colors"
+                      >
+                        Back to Preview
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      {song.previewUrl ? (
+                        <audio 
+                          key={song.id}
+                          controls 
+                          className="w-full h-6 accent-purple-500 opacity-60 hover:opacity-100 transition-opacity"
+                          src={song.previewUrl}
+                        >
+                          Your browser does not support the audio element.
+                        </audio>
+                      ) : (
+                        <p className="text-[8px] font-black uppercase text-neutral-700">Preview not available</p>
+                      )}
+                      {song.spotifyId && (
+                        <button 
+                          onClick={() => setActiveFullPlayer(song.id)}
+                          className="mt-2 w-full flex items-center justify-center gap-1 text-[8px] font-black uppercase text-green-500 hover:text-green-400 transition-colors"
+                        >
+                          <Disc className="w-2 h-2" />
+                          Play Full Song
+                        </button>
+                      )}
+                    </>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between gap-2 mt-2">
                     <span className="text-[8px] font-black uppercase tracking-tighter text-neutral-600">#{song.genre}</span>
+                    <a 
+                      href={song.spotifyId ? `https://open.spotify.com/track/${song.spotifyId}` : `https://open.spotify.com/search/${encodeURIComponent(song.title + ' ' + song.artist)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[8px] font-black uppercase text-purple-500 hover:underline"
+                    >
+                      Spotify Link
+                    </a>
                 </div>
               </div>
             </motion.div>

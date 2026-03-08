@@ -1,27 +1,26 @@
 
 import React, { useState } from 'react';
 import { User, UserRole } from '../types';
-import { Menu, X, LogOut, Music, Sparkles, Bookmark, ShieldCheck } from 'lucide-react';
+import { Menu, X, LogOut, Music, Sparkles, Bookmark, ShieldCheck, Compass } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface NavbarProps {
   user: User;
   onLogout: () => void;
   currentView: string;
-  onNavigate: (view: 'dashboard' | 'reels' | 'admin' | 'saved') => void;
+  onNavigate: (view: 'dashboard' | 'admin' | 'saved') => void;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ user, onLogout, currentView, onNavigate }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const navItems: { label: string; view: 'dashboard' | 'reels' | 'admin' | 'saved'; icon: React.ReactNode; role?: UserRole }[] = [
+  const navItems: { label: string; view: 'dashboard' | 'admin' | 'saved'; icon: React.ReactNode; role?: UserRole }[] = [
     { label: 'Discover', view: 'dashboard', icon: <Sparkles className="w-4 h-4" /> },
-    { label: 'Feed', view: 'reels', icon: <Music className="w-4 h-4" /> },
     { label: 'Saved', view: 'saved', icon: <Bookmark className="w-4 h-4" /> },
     { label: 'Admin', view: 'admin', icon: <ShieldCheck className="w-4 h-4" />, role: UserRole.ADMIN },
   ];
 
-  const handleNavigate = (view: 'dashboard' | 'reels' | 'admin' | 'saved') => {
+  const handleNavigate = (view: 'dashboard' | 'admin' | 'saved') => {
     onNavigate(view);
     setIsMobileMenuOpen(false);
   };

@@ -19,6 +19,7 @@ export interface User {
   role: UserRole;
   savedSongs: string[];
   likedSongs: string[];
+  spotifyToken?: string;
 }
 
 export interface Song {
@@ -33,6 +34,7 @@ export interface Song {
   isTrending: boolean;
   createdBy: string;
   spotifyId?: string;
+  lyricsSnippet?: string;
 }
 
 export interface RecommendedTrack {
@@ -40,6 +42,9 @@ export interface RecommendedTrack {
   artist: string;
   whyMatch: string;
   tags: string[];
+  spotifyId?: string;
+  lyricsSnippet?: string;
+  previewUrl?: string;
 }
 
 export interface AIRecommendation {

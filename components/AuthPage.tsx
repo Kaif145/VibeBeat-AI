@@ -119,7 +119,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onAuth }) => {
           </motion.button>
         </form>
 
-        <div className="text-center mt-8">
+        <div className="text-center mt-8 space-y-4">
           <p className="text-xs text-neutral-500 font-medium">
             {isLogin ? "Don't have an account?" : "Already have an account?"}{' '}
             <button
@@ -129,6 +129,19 @@ const AuthPage: React.FC<AuthPageProps> = ({ onAuth }) => {
               {isLogin ? 'Sign Up' : 'Login'}
             </button>
           </p>
+          <button
+            onClick={() => onAuth({
+              id: 'guest-' + Math.random().toString(36).substr(2, 9),
+              name: 'Guest User',
+              email: 'guest@vibebeat.com',
+              role: UserRole.USER,
+              savedSongs: [],
+              likedSongs: []
+            })}
+            className="text-[10px] text-neutral-400 hover:text-white font-black uppercase tracking-[0.2em] transition-colors"
+          >
+            Skip Login
+          </button>
         </div>
 
         <div className="mt-10 pt-8 border-t border-neutral-800/50 text-center">

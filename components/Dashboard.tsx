@@ -1,8 +1,24 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Language, AIRecommendation, User } from '../types';
-import { ChevronLeft, Info, Bookmark, Play, RefreshCw, Camera, Music2, Search } from 'lucide-react';
+import { ChevronLeft, Info, Bookmark, Play, RefreshCw, Camera, Music2, Search, ExternalLink, Sparkles, Disc } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import SpotifyEmbed from './SpotifyEmbed';
+
+interface SpotifyTrack {
+  id: string;
+  title: string;
+  artist: string;
+  album: string;
+  coverUrl: string;
+  previewUrl: string | null;
+  spotifyUrl: string;
+}
+
+interface RecommendationState {
+  matches: SpotifyTrack[];
+  selectedIndex: number;
+}
 
 interface DashboardProps {
   user: User;
@@ -11,14 +27,49 @@ interface DashboardProps {
   analysis: AIRecommendation | null;
   analysisSource: 'mood' | 'photo' | null;
   onClearAnalysis: () => void;
-  onSaveTrack: (songId: string) => void;
+  onSaveTrack: (songId: string, songData?: any) => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ user, onMoodSubmit, onPhotoSubmit, analysis, analysisSource, onClearAnalysis, onSaveTrack }) => {
   const [mood, setMood] = useState('');
-  const [prefLanguage, setPrefLanguage] = useState<Language>(Language.MIX);
+  const [prefLanguage, setPrefLanguage] = useState<Language>(Language.ENGLISH);
+  const [playerMode, setPlayerMode] = useState<'preview' | 'full'>('preview');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [showFullAnalysis, setShowFullAnalysis] = useState(false);
+  const [spotifyDataMap, setSpotifyDataMap] = useState<Record<string, RecommendationState>>({});
+  const [isFetchingSpotify, setIsFetchingSpotify] = useState(false);
+
+  useEffect(() => {
+    if (analysis) {
+      fetchSpotifyDataForRecommendations();
+    }
+  }, [analysis]);
+
+  const fetchSpotifyDataForRecommendations = async () => {
+    if (!analysis) return;
+    setIsFetchingSpotify(true);
+    const newMap: Record<string, RecommendationState> = {};
+
+    const fetchPromises = analysis.recommendedTracks.map(async (track) => {
+      try {
+        const query = `${track.title} ${track.artist}`;
+        const res = await fetch(`/api/spotify/search?q=${encodeURIComponent(query)}`);
+        const data = await res.json();
+        if (data.tracks && data.tracks.length > 0) {
+          newMap[`${track.title}-${track.artist}`] = {
+            matches: data.tracks,
+            selectedIndex: 0
+          };
+        }
+      } catch (err) {
+        console.error("Error fetching Spotify data for", track.title, err);
+      }
+    });
+
+    await Promise.all(fetchPromises);
+    setSpotifyDataMap(newMap);
+    setIsFetchingSpotify(false);
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -51,7 +102,44 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onMoodSubmit, onPhotoSubmit
 
   const handleSaveAIRecommendation = (title: string, artist: string) => {
     const virtualId = `ai-${title}-${artist}`.replace(/\s+/g, '-').toLowerCase();
-    onSaveTrack(virtualId);
+    const state = spotifyDataMap[`${title}-${artist}`];
+    const spotifyTrack = state?.matches[state.selectedIndex];
+    
+    const aiTrack = analysis?.recommendedTracks.find(t => t.title === title && t.artist === artist);
+    
+    if (spotifyTrack) {
+      const songData: any = {
+        id: virtualId,
+        title: spotifyTrack.title,
+        artist: spotifyTrack.artist,
+        genre: 'Discovery',
+        vibe: analysis?.vibe || 'AI Mix',
+        language: prefLanguage,
+        previewUrl: spotifyTrack.previewUrl || '',
+        coverUrl: spotifyTrack.coverUrl,
+        isTrending: false,
+        createdBy: 'ai',
+        spotifyId: spotifyTrack.id,
+        lyricsSnippet: aiTrack?.lyricsSnippet
+      };
+      onSaveTrack(virtualId, songData);
+    } else {
+      onSaveTrack(virtualId);
+    }
+  };
+
+  const cycleMatch = (key: string) => {
+    setSpotifyDataMap(prev => {
+      const state = prev[key];
+      if (!state) return prev;
+      return {
+        ...prev,
+        [key]: {
+          ...state,
+          selectedIndex: (state.selectedIndex + 1) % state.matches.length
+        }
+      };
+    });
   };
 
   if (analysis) {
@@ -128,62 +216,185 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onMoodSubmit, onPhotoSubmit
               <div className="flex-1 h-[1px] bg-neutral-200"></div>
             </div>
             
-            {analysis.recommendedTracks.map((track, i) => (
-              <motion.div 
-                key={i}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-white border border-neutral-200 rounded-[40px] p-6 md:p-10 shadow-sm space-y-6 hover:border-purple-300 transition-all group"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="space-y-1">
-                    <h4 className="text-neutral-900 text-2xl md:text-4xl font-black tracking-tighter leading-none group-hover:text-purple-600 transition-colors">{track.title}</h4>
-                    <p className="text-neutral-400 text-lg md:text-xl font-bold italic">by {track.artist}</p>
+            {analysis.recommendedTracks.map((track, i) => {
+              const stateKey = `${track.title}-${track.artist}`;
+              const state = spotifyDataMap[stateKey];
+              const spotifyTrack = state?.matches[state.selectedIndex];
+              
+              return (
+                <motion.div 
+                  key={i}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  className="bg-white border border-neutral-200 rounded-[40px] p-6 md:p-10 shadow-sm space-y-6 hover:border-purple-300 transition-all group"
+                >
+                  <div className="flex items-start justify-between gap-6">
+                    <div className="flex gap-6 items-start">
+                      {spotifyTrack ? (
+                        <div className="w-24 h-24 md:w-32 md:h-32 shrink-0 rounded-3xl overflow-hidden shadow-lg border border-neutral-100 relative group/art">
+                          <img src={spotifyTrack.coverUrl} alt={spotifyTrack.album} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                          {state.matches.length > 1 && (
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); cycleMatch(stateKey); }}
+                              className="absolute inset-0 bg-black/40 opacity-0 group-hover/art:opacity-100 transition-opacity flex flex-col items-center justify-center text-white"
+                            >
+                              <RefreshCw className="w-6 h-6 mb-1" />
+                              <span className="text-[8px] font-black uppercase">Next Match</span>
+                              <span className="text-[8px] opacity-60">{state.selectedIndex + 1}/{state.matches.length}</span>
+                            </button>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="w-24 h-24 md:w-32 md:h-32 shrink-0 rounded-3xl bg-neutral-100 flex items-center justify-center border border-neutral-200">
+                          <Music2 className="w-8 h-8 text-neutral-300" />
+                        </div>
+                      )}
+                      <div className="space-y-1">
+                        <h4 className="text-neutral-900 text-2xl md:text-4xl font-black tracking-tighter leading-none group-hover:text-purple-600 transition-colors">
+                          {spotifyTrack?.title || track.title}
+                        </h4>
+                        <p className="text-neutral-400 text-lg md:text-xl font-bold italic">
+                          by {spotifyTrack?.artist || track.artist}
+                        </p>
+                        {spotifyTrack && (
+                          <div className="flex items-center gap-2 mt-2">
+                            <p className="text-neutral-300 text-[10px] font-black uppercase tracking-widest">
+                              Album: {spotifyTrack.album}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <motion.button 
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => handleSaveAIRecommendation(track.title, track.artist)}
+                      className={`shrink-0 p-4 rounded-full transition-all duration-300 border flex items-center justify-center ${
+                        isSaved(track.title, track.artist)
+                          ? 'bg-purple-600 border-purple-600 text-white shadow-xl shadow-purple-500/30'
+                          : 'bg-neutral-50 border-neutral-100 text-neutral-300 hover:border-purple-200 hover:text-purple-500 hover:bg-white'
+                      }`}
+                    >
+                      <Bookmark className="w-6 h-6" fill={isSaved(track.title, track.artist) ? "currentColor" : "none"} />
+                    </motion.button>
                   </div>
-                  <motion.button 
-                    whileHover={{ scale: 1.1, rotate: 5 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => handleSaveAIRecommendation(track.title, track.artist)}
-                    className={`shrink-0 p-4 rounded-full transition-all duration-300 border flex items-center justify-center ${
-                      isSaved(track.title, track.artist)
-                        ? 'bg-purple-600 border-purple-600 text-white shadow-xl shadow-purple-500/30'
-                        : 'bg-neutral-50 border-neutral-100 text-neutral-300 hover:border-purple-200 hover:text-purple-500 hover:bg-white'
-                    }`}
-                  >
-                    <Bookmark className="w-6 h-6" fill={isSaved(track.title, track.artist) ? "currentColor" : "none"} />
-                  </motion.button>
-                </div>
 
-                <div className="flex flex-wrap gap-2">
-                  {track.tags.map((tag) => (
-                    <span key={tag} className="px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest bg-neutral-100 text-neutral-400 group-hover:bg-purple-50 group-hover:text-purple-600 transition-colors">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+                  <div className="flex flex-wrap gap-2">
+                    {track.tags.map((tag) => (
+                      <span key={tag} className="px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest bg-neutral-100 text-neutral-400 group-hover:bg-purple-50 group-hover:text-purple-600 transition-colors">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
 
-                <div className="bg-neutral-50/80 p-6 rounded-3xl border border-neutral-100/50">
-                    <p className="text-neutral-500 leading-relaxed italic text-sm md:text-base font-medium">
-                    "{track.whyMatch}"
-                    </p>
-                </div>
+                  <div className="bg-neutral-50/80 p-6 rounded-3xl border border-neutral-100/50 space-y-4">
+                      <p className="text-neutral-500 leading-relaxed italic text-sm md:text-base font-medium">
+                        "{track.whyMatch}"
+                      </p>
+                      {track.lyricsSnippet && (
+                        <div className="pt-4 border-t border-neutral-200/50">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-purple-400 mb-2 flex items-center gap-2">
+                            <Sparkles className="w-3 h-3" />
+                            30s Lyric Highlight
+                          </p>
+                          <p className="text-neutral-800 text-sm md:text-base font-bold leading-relaxed whitespace-pre-line">
+                            {track.lyricsSnippet}
+                          </p>
+                        </div>
+                      )}
+                  </div>
 
-                <div className="pt-2">
-                  <motion.a 
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    href={`https://open.spotify.com/search/${encodeURIComponent(track.title + ' ' + track.artist)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full bg-[#1DB954] text-white font-black py-5 px-8 rounded-full flex items-center justify-center gap-4 hover:bg-[#1ed760] transition-all shadow-xl shadow-green-500/10 uppercase tracking-widest text-xs"
-                  >
-                    <Play className="w-5 h-5 fill-current" />
-                    Full Stream on Spotify
-                  </motion.a>
-                </div>
-              </motion.div>
-            ))}
+                  <div className="pt-2 space-y-4">
+                    {spotifyTrack ? (
+                      <div className="space-y-4">
+                        {/* Player Mode Toggle */}
+                        <div className="flex justify-center mb-2">
+                          <div className="bg-neutral-100 p-1 rounded-full border border-neutral-200 flex gap-1">
+                            <button 
+                              onClick={() => setPlayerMode('preview')}
+                              className={`px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${
+                                playerMode === 'preview' ? 'bg-purple-500 text-white shadow-md shadow-purple-500/20' : 'text-neutral-400 hover:text-neutral-600'
+                              }`}
+                            >
+                              30s Preview
+                            </button>
+                            <button 
+                              onClick={() => setPlayerMode('full')}
+                              className={`px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${
+                                playerMode === 'full' ? 'bg-[#1DB954] text-white shadow-md shadow-green-500/20' : 'text-neutral-400 hover:text-neutral-600'
+                              }`}
+                            >
+                              Full Player
+                            </button>
+                          </div>
+                        </div>
+
+                        {playerMode === 'full' ? (
+                          <SpotifyEmbed trackId={spotifyTrack.id} height={152} />
+                        ) : spotifyTrack.previewUrl ? (
+                          <div className="bg-neutral-900 rounded-2xl p-4 flex items-center gap-4 border border-neutral-800">
+                            <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center shrink-0">
+                                <Play className="w-5 h-5 text-white fill-current" />
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-white text-[10px] font-black uppercase tracking-widest mb-1">30s Preview</p>
+                                <audio 
+                                    key={spotifyTrack.id}
+                                    controls 
+                                    className="w-full h-8 accent-purple-500"
+                                    src={spotifyTrack.previewUrl}
+                                >
+                                    Your browser does not support the audio element.
+                                </audio>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="p-4 bg-neutral-900/50 border border-dashed border-neutral-800 rounded-2xl text-center">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-neutral-500 mb-1">Preview not available</p>
+                            <p className="text-[10px] text-neutral-600">This track doesn't support direct previews.</p>
+                          </div>
+                        )}
+                        
+                        <motion.a 
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          href={spotifyTrack.spotifyUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full bg-[#1DB954] text-white font-black py-4 px-8 rounded-full flex items-center justify-center gap-4 hover:bg-[#1ed760] transition-all shadow-xl shadow-green-500/10 uppercase tracking-widest text-[10px]"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                          Listen Full on Spotify
+                        </motion.a>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        <div className="p-4 bg-neutral-50 border border-dashed border-neutral-200 rounded-2xl text-center">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-neutral-400 mb-2">
+                            {isFetchingSpotify ? 'Searching Spotify...' : 'Direct Stream Unavailable'}
+                          </p>
+                          <p className="text-xs text-neutral-500 font-medium">
+                            {isFetchingSpotify ? 'Finding the perfect match...' : 'Use the search button below to find this track.'}
+                          </p>
+                        </div>
+                        <motion.a 
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          href={`https://open.spotify.com/search/${encodeURIComponent(track.title + ' ' + track.artist)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full bg-black text-white font-black py-4 px-8 rounded-full flex items-center justify-center gap-4 hover:bg-neutral-800 transition-all shadow-xl shadow-black/10 uppercase tracking-widest text-[10px]"
+                        >
+                          <Search className="w-4 h-4" />
+                          Search on Spotify
+                        </motion.a>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              );
+            })}
 
             <motion.button 
               whileHover={{ scale: 1.01 }}
@@ -239,6 +450,26 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onMoodSubmit, onPhotoSubmit
           </div>
           
           <form onSubmit={handleMoodSearch} className="space-y-6 relative z-10">
+            <div className="flex flex-wrap gap-2 mb-4">
+              {[
+                { label: 'Chill', icon: '🌊' },
+                { label: 'Energetic', icon: '⚡' },
+                { label: 'Romantic', icon: '❤️' },
+                { label: 'Melancholy', icon: '🌧️' },
+                { label: 'Focus', icon: '🧠' },
+                { label: 'Party', icon: '🎉' }
+              ].map(m => (
+                <button
+                  key={m.label}
+                  type="button"
+                  onClick={() => setMood(m.label)}
+                  className="px-4 py-2 bg-black/40 border border-neutral-800 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-purple-500/20 hover:border-purple-500/50 transition-all flex items-center gap-2"
+                >
+                  <span>{m.icon}</span>
+                  {m.label}
+                </button>
+              ))}
+            </div>
             <textarea
               value={mood}
               onChange={(e) => setMood(e.target.value)}

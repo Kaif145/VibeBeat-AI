@@ -5,15 +5,17 @@ import { Language, Song } from './types';
 export const INITIAL_SONGS: Song[] = [
   {
     id: '1',
-    title: 'Midnight Dreams',
-    artist: 'Luna Eclipse',
-    genre: 'Synthwave',
+    title: 'Midnight City',
+    artist: 'M83',
+    genre: 'Synth-pop',
     vibe: 'aesthetic',
     language: Language.ENGLISH,
-    previewUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-    coverUrl: 'https://picsum.photos/seed/music1/800/1200',
+    previewUrl: 'https://p.scdn.co/mp3-preview/3806a6566863152018593361a877995393160a0a?cid=df827e99f9cb45ed8b6a80e8bbdafb24',
+    coverUrl: 'https://picsum.photos/seed/m83/800/1200',
     isTrending: true,
-    createdBy: 'admin'
+    createdBy: 'admin',
+    spotifyId: '1eyzqe2QqGZUmfc2trlv96',
+    lyricsSnippet: "Waiting in a car\nWaiting for a ride in the dark\nThe night city grows\nLook at the horizon glow"
   },
   {
     id: '2',
@@ -22,22 +24,26 @@ export const INITIAL_SONGS: Song[] = [
     genre: 'Romantic',
     vibe: 'romantic',
     language: Language.HINDI,
-    previewUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
-    coverUrl: 'https://picsum.photos/seed/music2/800/1200',
+    previewUrl: 'https://p.scdn.co/mp3-preview/7533037996112d6e32630711928646b541300806?cid=df827e99f9cb45ed8b6a80e8bbdafb24',
+    coverUrl: 'https://picsum.photos/seed/arijit/800/1200',
     isTrending: false,
-    createdBy: 'admin'
+    createdBy: 'admin',
+    spotifyId: '569979316657924096',
+    lyricsSnippet: "Hum tere bin ab reh nahi sakte\nTere bina kya wajood mera\nKyunki tum hi ho, ab tum hi ho\nZindagi ab tum hi ho"
   },
   {
     id: '3',
-    title: 'Urban Jungle',
-    artist: 'Rhythm Master',
-    genre: 'Hip Hop',
-    vibe: 'gym',
+    title: 'Blinding Lights',
+    artist: 'The Weeknd',
+    genre: 'Synthwave',
+    vibe: 'party',
     language: Language.ENGLISH,
-    previewUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
-    coverUrl: 'https://picsum.photos/seed/music3/800/1200',
+    previewUrl: 'https://p.scdn.co/mp3-preview/88406987f283f361786371999293618833610a0a?cid=df827e99f9cb45ed8b6a80e8bbdafb24',
+    coverUrl: 'https://picsum.photos/seed/weeknd/800/1200',
     isTrending: true,
-    createdBy: 'admin'
+    createdBy: 'admin',
+    spotifyId: '0VjIjW4GlUZ8oBR0rO96J7',
+    lyricsSnippet: "I said, ooh, I'm blinded by the lights\nNo, I can't sleep until I feel your touch\nI said, ooh, I'm drowning in the night"
   },
   {
     id: '4',
@@ -46,22 +52,26 @@ export const INITIAL_SONGS: Song[] = [
     genre: 'Folk Pop',
     vibe: 'sad',
     language: Language.BENGALI,
-    previewUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
-    coverUrl: 'https://picsum.photos/seed/music4/800/1200',
+    previewUrl: '',
+    coverUrl: 'https://picsum.photos/seed/shreya/800/1200',
     isTrending: false,
-    createdBy: 'admin'
+    createdBy: 'admin',
+    spotifyId: '2FvM6W6W6W6W6W6W6W6W6W',
+    lyricsSnippet: "Mon majhe tui achis\nBhalobasha tui achis\nSokal bikel tui achis\nAmar moner majhe"
   },
   {
     id: '5',
-    title: 'Gaddi Chaddi',
-    artist: 'Diljit Dosanjh',
-    genre: 'Bhangra',
-    vibe: 'party',
-    language: Language.PUNJABI,
-    previewUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
-    coverUrl: 'https://picsum.photos/seed/music5/800/1200',
+    title: 'Peaches',
+    artist: 'Justin Bieber',
+    genre: 'Pop',
+    vibe: 'chill',
+    language: Language.ENGLISH,
+    previewUrl: 'https://p.scdn.co/mp3-preview/88406987f283f361786371999293618833610a0a?cid=df827e99f9cb45ed8b6a80e8bbdafb24',
+    coverUrl: 'https://picsum.photos/seed/bieber/800/1200',
     isTrending: true,
-    createdBy: 'admin'
+    createdBy: 'admin',
+    spotifyId: '4iJyoBOLtHrtic0jviDpmG',
+    lyricsSnippet: "I got my peaches out in Georgia (oh, yeah, shit)\nI get my weed from California (that's that shit)\nI took my chick up to the North, yeah (badass bitch)"
   },
   {
     id: '6',
@@ -70,9 +80,53 @@ export const INITIAL_SONGS: Song[] = [
     genre: 'Lo-Fi',
     vibe: 'travel',
     language: Language.MIX,
-    previewUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3',
-    coverUrl: 'https://picsum.photos/seed/music6/800/1200',
+    previewUrl: '',
+    coverUrl: 'https://picsum.photos/seed/lofi/800/1200',
     isTrending: false,
-    createdBy: 'admin'
+    createdBy: 'admin',
+    spotifyId: '579316657924096',
+    lyricsSnippet: "(Instrumental Focus)\nSoft rhythmic pulses\nAtmospheric textures\nA journey through sound"
+  },
+  {
+    id: '7',
+    title: 'Gul',
+    artist: 'Anuv Jain',
+    genre: 'Indie Pop',
+    vibe: 'romantic',
+    language: Language.HINDI,
+    previewUrl: 'https://p.scdn.co/mp3-preview/7c493618833610a0a88406987f283f3617863719?cid=df827e99f9cb45ed8b6a80e8bbdafb24',
+    coverUrl: 'https://picsum.photos/seed/anuv/800/1200',
+    isTrending: true,
+    createdBy: 'admin',
+    spotifyId: '4iJyoBOLtHrtic0jviDpmG',
+    lyricsSnippet: "Na jaane kyun, teri yaadon mein\nKhoya rehta hoon main\nGulon ki tarah, tu khilti rahe\nBas yahi dua hai meri"
+  },
+  {
+    id: '8',
+    title: 'Dhundlo',
+    artist: 'Talwiinder',
+    genre: 'Punjabi Pop',
+    vibe: 'chill',
+    language: Language.PUNJABI,
+    previewUrl: 'https://p.scdn.co/mp3-preview/178637199293618833610a0a88406987f283f361?cid=df827e99f9cb45ed8b6a80e8bbdafb24',
+    coverUrl: 'https://picsum.photos/seed/talwiinder/800/1200',
+    isTrending: true,
+    createdBy: 'admin',
+    spotifyId: '0VjIjW4GlUZ8oBR0rO96J7',
+    lyricsSnippet: "Dhundlo sa hai sab kuch\nYaadon mein teri\nRaatan nu neend ni aundi\nBas teri kami hai"
+  },
+  {
+    id: '9',
+    title: 'Excuses',
+    artist: 'AP Dhillon',
+    genre: 'Punjabi Pop',
+    vibe: 'party',
+    language: Language.PUNJABI,
+    previewUrl: 'https://p.scdn.co/mp3-preview/88406987f283f361786371999293618833610a0a?cid=df827e99f9cb45ed8b6a80e8bbdafb24',
+    coverUrl: 'https://picsum.photos/seed/apdhillon/800/1200',
+    isTrending: true,
+    createdBy: 'admin',
+    spotifyId: '0VjIjW4GlUZ8oBR0rO96J7',
+    lyricsSnippet: "Kehndi hundi si chan tak raah bana de\nTaare ne pasand mainu hethan saare laade"
   }
 ];
