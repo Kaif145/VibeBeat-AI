@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import axios from "axios";
@@ -14,7 +17,16 @@ async function startServer() {
   const PORT = 3000;
 
   // MongoDB Connection
-  const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://kaifurrahaman145_db_user:YOUR_PASSWORD@cluster0.isbqz5q.mongodb.net/myDatabase";
+  const MONGODB_URI =
+    process.env.MONGODB_URI ||
+    "mongodb+srv://kaifurrahaman145_db_user:YOUR_PASSWORD@cluster0.isbqz5q.mongodb.net/myDatabase";
+  if (!process.env.MONGODB_URI) {
+    console.warn(
+      "MONGODB_URI environment variable is not set; using fallback placeholder.\n" +
+        "Please add a valid MongoDB connection string to your .env file.",
+    );
+  }
+
   try {
     await mongoose.connect(MONGODB_URI);
     console.log("Connected to MongoDB Atlas successfully");
@@ -26,9 +38,17 @@ async function startServer() {
   app.use(cookieParser());
 
   // Spotify Config
-  const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID || "df827e99f9cb45ed8b6a80e8bbdafb24";
+  const SPOTIFY_CLIENT_ID =
+    process.env.SPOTIFY_CLIENT_ID || "df827e99f9cb45ed8b6a80e8bbdafb24";
   const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
-  const SCOPES = "user-read-private user-read-email user-library-read user-library-modify";
+  const SCOPES =
+    "user-read-private user-read-email user-library-read user-library-modify";
+
+  if (!SPOTIFY_CLIENT_SECRET) {
+    console.warn(
+      "SPOTIFY_CLIENT_SECRET is not defined. Spotify features will not work until you set it in .env.",
+    );
+  }
 
   let clientAccessToken = "";
   let tokenExpiry = 0;
@@ -39,7 +59,7 @@ async function startServer() {
     }
 
     if (!SPOTIFY_CLIENT_SECRET) {
-      console.warn("SPOTIFY_CLIENT_SECRET is not defined. Spotify search might fail.");
+      // already warned at startup
       return null;
     }
 
@@ -51,17 +71,20 @@ async function startServer() {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
             Authorization: `Basic ${Buffer.from(
-              `${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`
+              `${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`,
             ).toString("base64")}`,
           },
-        }
+        },
       );
 
       clientAccessToken = response.data.access_token;
       tokenExpiry = Date.now() + response.data.expires_in * 1000 - 60000; // Subtract 1 min for safety
       return clientAccessToken;
     } catch (err: any) {
-      console.error("Failed to get Spotify Client Access Token:", err.response?.data || err.message);
+      console.error(
+        "Failed to get Spotify Client Access Token:",
+        err.response?.data || err.message,
+      );
       return null;
     }
   };
@@ -72,7 +95,8 @@ async function startServer() {
     if (!q) return res.status(400).json({ error: "Query required" });
 
     const token = await getClientAccessToken();
-    if (!token) return res.status(500).json({ error: "Spotify authentication failed" });
+    if (!token)
+      return res.status(500).json({ error: "Spotify authentication failed" });
 
     try {
       const response = await axios.get("https://api.spotify.com/v1/search", {
@@ -113,7 +137,7 @@ async function startServer() {
 
   // 1. Get Spotify Auth URL
   const getRedirectUri = (req: express.Request) => {
-    // In this environment, we should use the APP_URL if provided, 
+    // In this environment, we should use the APP_URL if provided,
     // otherwise fallback to the request host
     const appUrl = process.env.APP_URL;
     if (appUrl) {
@@ -135,7 +159,9 @@ async function startServer() {
       show_dialog: "true",
     });
 
-    res.json({ url: `https://accounts.spotify.com/authorize?${params.toString()}` });
+    res.json({
+      url: `https://accounts.spotify.com/authorize?${params.toString()}`,
+    });
   });
 
   // 2. Callback Handler
@@ -161,7 +187,7 @@ async function startServer() {
 
     try {
       const redirectUri = getRedirectUri(req);
-      
+
       const tokenResponse = await axios.post(
         "https://accounts.spotify.com/api/token",
         new URLSearchParams({
@@ -173,10 +199,10 @@ async function startServer() {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
             Authorization: `Basic ${Buffer.from(
-              `${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`
+              `${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`,
             ).toString("base64")}`,
           },
-        }
+        },
       );
 
       const { access_token, refresh_token, expires_in } = tokenResponse.data;
@@ -205,7 +231,10 @@ async function startServer() {
         </html>
       `);
     } catch (err: any) {
-      console.error("Spotify Token Exchange Error:", err.response?.data || err.message);
+      console.error(
+        "Spotify Token Exchange Error:",
+        err.response?.data || err.message,
+      );
       res.status(500).send("Failed to exchange token");
     }
   });
