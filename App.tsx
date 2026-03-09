@@ -23,12 +23,12 @@ const App: React.FC = () => {
 
   // 1. Initial Load: Only on mount
   useEffect(() => {
-    const savedUser = localStorage.getItem('vibeBeat_user');
+    const savedUser = localStorage.getItem('vibeSnap_user');
     if (savedUser) {
       setUser(JSON.parse(savedUser));
     }
 
-    const savedCustomSongs = localStorage.getItem('vibeBeat_custom_songs');
+    const savedCustomSongs = localStorage.getItem('vibeSnap_custom_songs');
     if (savedCustomSongs) {
       const customSongs: Song[] = JSON.parse(savedCustomSongs);
       setSongs(prev => {
@@ -47,7 +47,7 @@ const App: React.FC = () => {
         setUser(prev => {
           if (!prev) return null;
           const updatedUser = { ...prev, spotifyToken: accessToken };
-          localStorage.setItem('vibeBeat_user', JSON.stringify(updatedUser));
+          localStorage.setItem('vibeSnap_user', JSON.stringify(updatedUser));
           return updatedUser;
         });
       }
@@ -59,12 +59,12 @@ const App: React.FC = () => {
 
   const handleAuth = useCallback((loggedInUser: User) => {
     setUser(loggedInUser);
-    localStorage.setItem('vibeBeat_user', JSON.stringify(loggedInUser));
+    localStorage.setItem('vibeSnap_user', JSON.stringify(loggedInUser));
   }, []);
 
   const handleLogout = useCallback(() => {
     setUser(null);
-    localStorage.removeItem('vibeBeat_user');
+    localStorage.removeItem('vibeSnap_user');
     setCurrentView('dashboard');
     setCurrentAnalysis(null);
     setAnalysisSource(null);
@@ -80,7 +80,7 @@ const App: React.FC = () => {
           ? prev.likedSongs.filter(id => id !== songId) 
           : [...prev.likedSongs, songId]
       };
-      localStorage.setItem('vibeBeat_user', JSON.stringify(updatedUser));
+      localStorage.setItem('vibeSnap_user', JSON.stringify(updatedUser));
       return updatedUser;
     });
   }, []);
@@ -125,7 +125,7 @@ const App: React.FC = () => {
             const updatedSongs = [...prevSongs, newSong];
             // Persist only the AI discovered songs to local storage
             const customOnly = updatedSongs.filter(s => s.createdBy === 'ai');
-            localStorage.setItem('vibeBeat_custom_songs', JSON.stringify(customOnly));
+            localStorage.setItem('vibeSnap_custom_songs', JSON.stringify(customOnly));
             return updatedSongs;
           }
           return prevSongs;
@@ -138,7 +138,7 @@ const App: React.FC = () => {
           ? prevUser.savedSongs.filter(id => id !== songId) 
           : [...prevUser.savedSongs, songId]
       };
-      localStorage.setItem('vibeBeat_user', JSON.stringify(updatedUser));
+      localStorage.setItem('vibeSnap_user', JSON.stringify(updatedUser));
       return updatedUser;
     });
   }, [currentAnalysis]);

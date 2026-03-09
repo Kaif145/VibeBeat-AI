@@ -15,7 +15,7 @@ const VibeExplore: React.FC<VibeExploreProps> = ({ songs, user, onLike, onSave }
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
   const [activeVibe, setActiveVibe] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [playerMode, setPlayerMode] = useState<'preview' | 'full'>('preview');
+  const [playerMode, setPlayerMode] = useState<'preview' | 'full'>('full');
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const vibes = Array.from(new Set(songs.map(s => s.vibe)));

@@ -12,7 +12,7 @@ const Footer: React.FC = () => {
             <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center shadow-lg shadow-purple-500/20">
               <span className="text-white font-black text-xs">V</span>
             </div>
-            <h2 className="text-xl font-black tracking-tighter uppercase italic">VibeBeat AI</h2>
+            <h2 className="text-xl font-black tracking-tighter uppercase italic">vibeSnap</h2>
           </div>
           <p className="text-neutral-500 text-xs font-bold uppercase tracking-widest max-w-xs">
             Discovering the soundtrack to your soul through AI and emotion.
@@ -49,7 +49,7 @@ const Footer: React.FC = () => {
 
         <div className="text-center md:text-right space-y-2">
           <p className="text-[10px] font-black uppercase tracking-widest text-neutral-500">
-            © {new Date().getFullYear()} VibeBeat AI
+            © {new Date().getFullYear()} vibeSnap
           </p>
           <p className="text-[10px] font-black uppercase tracking-widest text-neutral-700 flex items-center justify-center md:justify-end gap-1">
             Made with <Heart className="w-2 h-2 fill-current text-red-500" /> for music lovers

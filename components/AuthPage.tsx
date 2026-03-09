@@ -66,7 +66,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onAuth }) => {
           </motion.div>
           <div className="space-y-1">
             <h2 className="text-4xl font-black italic tracking-tighter uppercase leading-none">
-              {isLogin ? 'Welcome Back' : 'Join VibeBeat'}
+              {isLogin ? 'Welcome Back' : 'Join vibeSnap'}
             </h2>
             <p className="text-gray-500 text-xs font-bold uppercase tracking-widest">Discover music through your emotions.</p>
           </div>
@@ -133,7 +133,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onAuth }) => {
             onClick={() => onAuth({
               id: 'guest-' + Math.random().toString(36).substr(2, 9),
               name: 'Guest User',
-              email: 'guest@vibebeat.com',
+              email: 'guest@vibesnap.com',
               role: UserRole.USER,
               savedSongs: [],
               likedSongs: []
@@ -146,7 +146,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onAuth }) => {
 
         <div className="mt-10 pt-8 border-t border-neutral-800/50 text-center">
           <p className="text-[10px] text-neutral-600 font-black uppercase tracking-[0.2em] leading-relaxed">
-            Hint: Use 'admin@vibebeat.com' to login as Admin
+            Hint: Use 'admin@vibesnap.com' to login as Admin
           </p>
         </div>
       </motion.div>

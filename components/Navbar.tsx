@@ -38,7 +38,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout, currentView, onNavigate
             <Music className="text-white w-6 h-6" />
           </div>
           <h1 className="text-2xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
-            VibeBeat AI
+            vibeSnap
           </h1>
         </motion.div>
 
@@ -102,7 +102,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout, currentView, onNavigate
                   <button 
                     key={item.view}
                     onClick={() => handleNavigate(item.view)}
-                    className={`flex items-center gap-4 text-4xl font-black uppercase tracking-widest transition-all ${
+                    className={`flex items-center gap-4 text-3xl font-black uppercase tracking-widest transition-all ${
                       currentView === item.view ? 'text-purple-500' : 'text-gray-500'
                     }`}
                   >

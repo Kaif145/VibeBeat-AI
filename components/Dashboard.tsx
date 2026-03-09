@@ -33,7 +33,7 @@ interface DashboardProps {
 const Dashboard: React.FC<DashboardProps> = ({ user, onMoodSubmit, onPhotoSubmit, analysis, analysisSource, onClearAnalysis, onSaveTrack }) => {
   const [mood, setMood] = useState('');
   const [prefLanguage, setPrefLanguage] = useState<Language>(Language.ENGLISH);
-  const [playerMode, setPlayerMode] = useState<'preview' | 'full'>('preview');
+  const [playerMode, setPlayerMode] = useState<'preview' | 'full'>('full');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [showFullAnalysis, setShowFullAnalysis] = useState(false);
   const [spotifyDataMap, setSpotifyDataMap] = useState<Record<string, RecommendationState>>({});
@@ -288,22 +288,17 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onMoodSubmit, onPhotoSubmit
                     ))}
                   </div>
 
-                  <div className="bg-neutral-50/80 p-6 rounded-3xl border border-neutral-100/50 space-y-4">
-                      <p className="text-neutral-500 leading-relaxed italic text-sm md:text-base font-medium">
-                        "{track.whyMatch}"
+                  {track.lyricsSnippet && (
+                    <div className="bg-neutral-50/80 p-6 rounded-3xl border border-neutral-100/50 space-y-4">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-purple-400 mb-2 flex items-center gap-2">
+                        <Sparkles className="w-3 h-3" />
+                        30s Lyric Highlight
                       </p>
-                      {track.lyricsSnippet && (
-                        <div className="pt-4 border-t border-neutral-200/50">
-                          <p className="text-[10px] font-black uppercase tracking-widest text-purple-400 mb-2 flex items-center gap-2">
-                            <Sparkles className="w-3 h-3" />
-                            30s Lyric Highlight
-                          </p>
-                          <p className="text-neutral-800 text-sm md:text-base font-bold leading-relaxed whitespace-pre-line">
-                            {track.lyricsSnippet}
-                          </p>
-                        </div>
-                      )}
-                  </div>
+                      <p className="text-neutral-800 text-sm md:text-base font-bold leading-relaxed whitespace-pre-line">
+                        {track.lyricsSnippet}
+                      </p>
+                    </div>
+                  )}
 
                   <div className="pt-2 space-y-4">
                     {spotifyTrack ? (
@@ -418,16 +413,16 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onMoodSubmit, onPhotoSubmit
   }
 
   return (
-    <div className="h-full overflow-y-auto p-6 md:p-12 max-w-5xl mx-auto space-y-12 pb-24">
+    <div className="h-full overflow-y-auto p-4 md:p-12 max-w-5xl mx-auto space-y-8 md:space-y-12 pb-24">
       <motion.header 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center space-y-6 max-w-2xl mx-auto"
+        className="text-center space-y-4 md:space-y-6 max-w-2xl mx-auto"
       >
         <h2 className="text-5xl md:text-8xl font-black italic uppercase tracking-tighter leading-none bg-clip-text text-transparent bg-gradient-to-b from-white to-neutral-700">
           Sync Your Soul
         </h2>
-        <p className="text-gray-500 text-sm md:text-lg font-bold uppercase tracking-[0.2em]">
+        <p className="text-gray-500 text-xs md:text-lg font-bold uppercase tracking-[0.2em] px-4">
           AI-Powered Visual & Emotional Audio Discovery
         </p>
       </motion.header>
@@ -438,7 +433,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onMoodSubmit, onPhotoSubmit
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-neutral-900/50 border border-neutral-800 p-8 md:p-10 rounded-[40px] space-y-8 hover:border-purple-500/50 transition-all group relative overflow-hidden"
+          className="bg-neutral-900/50 border border-neutral-800 p-6 md:p-10 rounded-[32px] md:rounded-[40px] space-y-6 md:space-y-8 hover:border-purple-500/50 transition-all group relative overflow-hidden"
         >
           <div className="absolute -top-10 -right-10 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl group-hover:bg-purple-500/20 transition-all"></div>
           
@@ -493,7 +488,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onMoodSubmit, onPhotoSubmit
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-neutral-900/50 border border-neutral-800 p-8 md:p-10 rounded-[40px] space-y-8 hover:border-blue-500/50 transition-all group relative overflow-hidden"
+          className="bg-neutral-900/50 border border-neutral-800 p-6 md:p-10 rounded-[32px] md:rounded-[40px] space-y-6 md:space-y-8 hover:border-blue-500/50 transition-all group relative overflow-hidden"
         >
           <div className="absolute -top-10 -right-10 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-all"></div>
           
