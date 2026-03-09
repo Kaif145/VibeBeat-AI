@@ -37,16 +37,15 @@ async function startServer() {
   app.use(express.json());
   app.use(cookieParser());
 
-  // Spotify Config
-  const SPOTIFY_CLIENT_ID =
-    process.env.SPOTIFY_CLIENT_ID || "df827e99f9cb45ed8b6a80e8bbdafb24";
+  // Spotify Config – load from environment only, never hardcode keys in source
+  const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
   const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
   const SCOPES =
     "user-read-private user-read-email user-library-read user-library-modify";
 
-  if (!SPOTIFY_CLIENT_SECRET) {
+  if (!SPOTIFY_CLIENT_ID || !SPOTIFY_CLIENT_SECRET) {
     console.warn(
-      "SPOTIFY_CLIENT_SECRET is not defined. Spotify features will not work until you set it in .env.",
+      "SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET must be defined in your .env file.",
     );
   }
 

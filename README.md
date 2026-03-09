@@ -31,11 +31,13 @@ npm install
 
 ## 🔑 Environment Variables
 
-Create a `.env` file and add:
+Create a `.env` file and add (do not commit this file to git):
 
 GEMINI_API_KEY=your_gemini_key  
 SPOTIFY_CLIENT_ID=your_spotify_client_id  
 SPOTIFY_CLIENT_SECRET=your_spotify_secret  
+
+> ⚠️ **Security note:** never store actual API keys in source control. If you've accidentally committed secrets (like a Spotify client ID/secret), rotate them immediately via the provider dashboard and clean your git history (see next section).
 
 ## ▶ Run the project
 
