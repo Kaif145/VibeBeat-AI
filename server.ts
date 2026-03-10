@@ -17,9 +17,13 @@ async function startServer() {
   const PORT = 3000;
 
   // MongoDB Connection
+  // **DO NOT** commit real credentials!  Always set MONGODB_URI in your
+  // environment (e.g. via a .env file or CI/CD secrets).  The fallback below
+  // is only a harmless example placeholder and contains no working
+  // username/password.
   const MONGODB_URI =
     process.env.MONGODB_URI ||
-    "mongodb+srv://kaifurrahaman145_db_user:YOUR_PASSWORD@cluster0.isbqz5q.mongodb.net/myDatabase";
+    "mongodb+srv://<username>:<password>@cluster0.mongodb.net/myDatabase";
   if (!process.env.MONGODB_URI) {
     console.warn(
       "MONGODB_URI environment variable is not set; using fallback placeholder.\n" +
